@@ -15,3 +15,104 @@
 //= require jquery
 //= require bootstrap.min
 //= require_tree .
+
+$(document).on('turbolinks:load',function() {
+
+    var base_url = window.location.origin;
+    //location.reload();
+
+    // $.ajax({
+    //   url: "/products?page=1",
+    //   type: 'GET',
+    //   success: function(res) {
+    //       console.log(res);
+    //       //alert(res);
+    //     }
+    // })
+  $('#login').click(function(){
+    $.ajax({
+      url: "/users/sign_in",
+      type: 'POST',
+      data:  {
+        "user": {
+          "email": $('#signin-email').val(),
+          "password": $('#signin-password').val()
+        }
+      },
+      success: function(res) {
+        window.location.href = base_url+'/products?page=1';
+        }
+    })
+  });
+
+  $('#signUp').click(function(){
+    $.ajax({
+      url: "/users",
+      type: 'POST',
+      data: {
+        "user": {
+          "email": $('#signup-email').val(),
+          "password": $('#signup-password').val(),
+          "password_confirmation": $('#signup-confirm-password').val()
+        }
+      },
+      success: function(res) {
+          window.location.href = base_url;
+        }
+    })
+  });
+
+  $('#logoutUser').click(function(){
+    $.ajax({
+      url: "/users/sign_out",
+      type: 'DELETE',
+      success: function(res) {
+          window.location.href = base_url;
+        }
+    })
+  });
+
+    $('.close').click(function(event){
+      $('.popup-overlay').hide();
+      $('.popup-content').hide();
+    });
+
+
+  $('.addToCart').click(function(){
+    var productID = $(this).data("productid");
+    var price = $(this).data("price");
+
+    $.ajax({
+      url: "/carts",
+      type: "POST",
+      data: {
+        "cart":{
+          "product_id": productID,
+          "total_price": price
+        }
+      },
+      success: function(res) {
+        $("#showSuccessCart").click();
+      }
+    });
+  });
+
+  $('#checkout').click(function(){
+    var cartIds = $(this).data("cartids");
+    console.log(cartIds);
+    $.ajax({
+      url: "/purchases",
+      type: "POST",
+      data: {
+        "purchase":{
+          "cart_ids": cartIds
+        }
+      }, success: function(res){
+        console.log(res);
+        $('#purchaseAmount').html( res.total_price);
+        $('#checkoutPouUp').click();
+      }
+    })
+  });
+
+  });
